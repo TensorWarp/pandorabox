@@ -1,0 +1,22 @@
+---
+repositories:
+  - name: tensorwarp-lab
+    url: s3://tensorwarp-helm-chart/lab
+
+templates:
+  default: &default
+    namespace: devops-tools
+    version: "1.4.0-rc"
+
+releases:
+  - name: laravel
+    chart: tensorwarp-lab/api
+    values:
+      - ./laravel-values.yml
+    <<: *default
+
+  - name: mariadb
+    chart: tensorwarp-lab/stateful
+    values:
+      - ./mariadb-values.yml
+    <<: *default
