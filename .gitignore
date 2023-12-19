@@ -69,7 +69,6 @@ errored.tfstate
 .*.swp
 .idea
 *.iml
-*.test
 *.iml
 .envrc
 
