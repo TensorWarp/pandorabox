@@ -42,7 +42,8 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             // Log the exception using the Log facade
-            Log::error($e->getMessage(), ['exception' => $e]);
-        });
+            Log::error($e->getMessage(), [
+                'exception' => $e,
+        ]);
     }
 }
