@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use Illuminate\Foundation\Application as LaravelApplication;
@@ -14,7 +16,6 @@ class Application extends LaravelApplication
 
         /**
          * Overwriting the app_path to autoload commands correctly.
-         *
          */
         $this->useAppPath($basePath . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'App');
     }
