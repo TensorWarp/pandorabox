@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
