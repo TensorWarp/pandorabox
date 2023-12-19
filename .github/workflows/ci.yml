@@ -15,40 +15,68 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        step: ['build-test', 'start-test', 'wait-for-db', 'drop-migrate', 'seed', 'info', 'phpunit', 'ecs', 'phpcs', 'phpstan', 'phpinsights', 'phpmd', 'phpcpd', 'stop-test']
+        php-version: [8.2]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build and Start Docker Images
-        run: make ${{ matrix.step }}
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, zip, pdo, pdo_pgsql
 
-      - name: Database Setup
+      - name: Build and start Docker images
         run: |
-          make wait-for-db
+          make build-test
+          make start-test
+
+      - name: Check running containers
+        run: docker ps -a
+
+      - name: Wait for database connection
+        run: make wait-for-db
+
+      - name: Run migrations and seeds
+        run: |
           make drop-migrate
           make seed
 
-      - name: Testing
-        run: |
-          make phpunit
-          make ecs
-          make phpcs
-          make phpstan
-          make phpinsights
-          make phpmd
-          make phpcpd
-
-      - name: Additional Checks
+      - name: Show framework version and additional info, PHP & Composer version
         run: make info
 
-      - name: Archive Coverage Data for Qodana
+      - name: Run test suite
+        run: make phpunit
+
+      - name: Archive coverage data for Qodana
         uses: actions/upload-artifact@v3
         with:
           name: php-coverage-data
           path: reports/clover.xml
 
-      - name: Stop Docker Images
+      - name: Run coding standard
+        run: make ecs
+
+      - name: Run codeSniffer
+        run: make phpcs
+
+      - name: Run PHPStan
+        run: make phpstan
+
+      - name: Run PHPInsights
+        run: make phpinsights
+
+      - name: Run PHP mess detector
+        run: make phpmd
+
+      - name: Run PHP copy-paste detector
+        run: make phpcpd
+
+      - name: Stop Docker images
         run: make stop-test
+
   
