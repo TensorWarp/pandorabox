@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import os
 import subprocess
+import argparse
+from enum import Enum
 
 AWS_ACCOUNT_ID = os.environ.get("AWS_ACCOUNT_ID")
 CI_ECR_PATH = os.environ.get("CI_ECR_PATH")
@@ -8,38 +10,52 @@ CI_ECR_PATH = os.environ.get("CI_ECR_PATH")
 CI_REGISTRY = f"{AWS_ACCOUNT_ID}.dkr.ecr.ap-us-west-2.amazonaws.com"
 IMAGE = f"{CI_REGISTRY}/{CI_ECR_PATH}"
 
-def docker_build(file_path, base_image, tags_id, custom_tags):
-    print(f"Build Image => {IMAGE}:{base_image}")
-    subprocess.run(["docker", "build", "-t", f"{IMAGE}:{base_image}", "-f", file_path, "."])
+DOCKER_BUILD_ARGS = ["docker", "build", "-f"]
+EXIT_CODE_ERROR = 1
+
+class TagChoices(Enum):
+    BASE = "base"
+    TAGS_ID = "tags_id"
+    CUSTOM_TAGS = "custom_tags"
+
+def execute_docker_command(file_path, *tag_parts):
+    image_tag = f"{IMAGE}:{'-'.join(tag_parts)}"
+    print(f"Build Image => {image_tag}")
     print('---')
+    subprocess.run(DOCKER_BUILD_ARGS + [file_path, "-t", image_tag, "."], check=True)
 
-    print(f"Build Image => {IMAGE}:{tags_id}")
-    subprocess.run(["docker", "build", "-t", f"{IMAGE}:{tags_id}", "-f", file_path, "."])
-    print('---')
+def validate_custom_tags(custom_tags):
+    invalid_char = next((char for char in custom_tags if not char.isalnum()), None)
+    if invalid_char is not None:
+        error_position = custom_tags.find(invalid_char) + 1
+        error_message = f"Error: Custom tags must be alphanumeric. Invalid character '{invalid_char}' at position {error_position}."
+        raise argparse.ArgumentError(None, error_message)
 
-    print(f"Build Image => {IMAGE}:{base_image}-{tags_id}")
-    subprocess.run(["docker", "build", "-t", f"{IMAGE}:{base_image}-{tags_id}", "-f", file_path, "."])
-    print('---')
+def build_docker_images(file_path, base_image, tags_id, custom_tags):
+    execute_docker_command(file_path, base_image, tags_id, custom_tags)
 
-    if custom_tags:
-        print(f"Build Image => {IMAGE}:{tags_id}-{custom_tags}")
-        subprocess.run(["docker", "build", "-t", f"{IMAGE}:{tags_id}-{custom_tags}", "-f", file_path, "."])
-        print('---')
+def main():
+    parser = argparse.ArgumentParser(description="Build Docker images with specified tags.")
+    parser.add_argument("file_path", help="Path to the Dockerfile")
+    parser.add_argument("base_image", help="Base image tag")
+    parser.add_argument("tags_id", choices=[tag.value for tag in TagChoices], help="Tags ID (choose from 'base', 'tags_id', 'custom_tags')")
+    parser.add_argument("custom_tags", nargs="?", default="", help="Custom tags")
 
-        print(f"Build Image => {IMAGE}:{base_image}-{tags_id}-{custom_tags}")
-        subprocess.run(["docker", "build", "-t", f"{IMAGE}:{base_image}-{tags_id}-{custom_tags}", "-f", file_path, "."])
-        print('---')
+    try:
+        args = parser.parse_args()
 
-def main(file_path, base_image, tags_id, custom_tags):
-    docker_build(file_path, base_image, tags_id, custom_tags)
-    print('')
-    print('-- ALL DONE --')
+        if args.tags_id == TagChoices.CUSTOM_TAGS.value:
+            validate_custom_tags(args.custom_tags)
+
+        build_docker_images(args.file_path, args.base_image, args.tags_id, args.custom_tags)
+
+        print("\n-- ALL DONE --")
+    except argparse.ArgumentError as e:
+        print(f"Error: {e}")
+        exit(EXIT_CODE_ERROR)
+    except KeyboardInterrupt:
+        print("\nScript interrupted by user.")
+        exit(EXIT_CODE_ERROR)
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) != 5:
-        print("Usage: python script.py <file_path> <base_image> <tags_id> <custom_tags>")
-        sys.exit(1)
-    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
-
-
+    main()
