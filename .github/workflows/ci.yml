@@ -85,9 +85,9 @@ jobs:
 
       - name: Build and push Docker image to GitHub Container Registry
         run: |
-          DOCKER_REPO="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}"
+          DOCKER_REPO="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/webtooling"
           DOCKER_TAG="latest"
-
+          DOCKER_REPO=$(echo $DOCKER_REPO | tr '[:upper:]' '[:lower:]')
           docker build -t $DOCKER_REPO:$DOCKER_TAG .
           docker push $DOCKER_REPO:$DOCKER_TAG
 
