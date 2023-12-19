@@ -76,15 +76,6 @@ jobs:
       - name: Run PHP copy-paste detector
         run: make phpcpd
 
-      - name: Stop Docker images
-        run: make stop-test
-
-  push-to-registry:
-    runs-on: ubuntu-latest
-
-    needs: build
-
-    steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -96,4 +87,7 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest .
           docker push ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+
+      - name: Stop Docker images
+        run: make stop-test
   
