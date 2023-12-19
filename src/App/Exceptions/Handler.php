@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Psr\Log\LoggerInterface;
 use Throwable;
+use Illuminate\Support\Facades\Log;
 
 class Handler extends ExceptionHandler
 {
@@ -36,31 +36,13 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Logger instance.
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        parent::__construct();
-        $this->logger = $logger;
-    }
-
-    /**
      * Register the exception handling callbacks for the application.
      */
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            // Log the exception
-            $this->logger->error($e->getMessage(), ['exception' => $e]);
+            // Log the exception using the Log facade
+            Log::error($e->getMessage(), ['exception' => $e]);
         });
     }
 }
