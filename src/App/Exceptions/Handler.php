@@ -44,6 +44,7 @@ class Handler extends ExceptionHandler
             // Log the exception using the Log facade
             Log::error($e->getMessage(), [
                 'exception' => $e,
-        ]);
+            ]);
+        });
     }
 }
