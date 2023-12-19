@@ -85,8 +85,11 @@ jobs:
 
       - name: Build and push Docker image to GitHub Container Registry
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+          DOCKER_REPO="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}"
+          DOCKER_TAG="latest"
+
+          docker build -t $DOCKER_REPO:$DOCKER_TAG .
+          docker push $DOCKER_REPO:$DOCKER_TAG
 
       - name: Stop Docker images
         run: make stop-test
