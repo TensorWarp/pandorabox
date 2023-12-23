@@ -36,7 +36,6 @@ class AiTextServices
 
     /**
      * An array of AI model types.
-     *
      */
     public const TYPES = [
         self::ADA,
@@ -51,7 +50,6 @@ class AiTextServices
 
     /**
      * An array of AI models used for chat completions.
-     *
      */
     public const CHAT_COMPLETIONS_ENDPOINT = [
         self::GPT_4,
@@ -66,7 +64,6 @@ class AiTextServices
 
     /**
      * An array of AI models used for general completions.
-     *
      */
     public const COMPLETIONS_ENDPOINT = [
         self::TEXT_DAVINCI_003,
