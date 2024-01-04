@@ -1,0 +1,11 @@
+{
+    "name": "OpenAI",
+    "alias": "openai",
+    "description": "",
+    "core": true,
+    "keywords": [],
+    "priority": 0,
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,28 @@
+{
+    "name": "laravel/openai-module",
+    "type": "laravel-module",
+    "description": "",
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\OpenAI\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "nwidart/laravel-modules": "^10.0",
+        "joshbrw/laravel-module-installer": "^2.0",
+        "openai-php/client": "0.6.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "joshbrw/laravel-module-installer": true
+        }
+    }
+}
